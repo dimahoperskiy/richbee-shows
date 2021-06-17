@@ -1,0 +1,83 @@
+.wrapper {
+    display: flex;
+    color: white;
+    align-self: center;
+    width: 100%;
+    border-radius: 10px;
+    margin: 5px;
+    background: #111111cb;
+    font-weight: 400;
+}
+
+.header {
+    display: flex;
+    margin: 1em 0 12px 0;
+}
+
+.inner {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.img {
+    width: 95px;
+    height: 141px;
+    border-radius: 8px;
+    margin: 20px 15px;
+}
+
+.title {
+    font-size: 1.5em;
+    margin: 0;
+    font-weight: 700;
+    width: 65%;
+}
+
+.info {
+    display: flex;
+}
+
+.info p {
+    margin-right: 10px;
+    margin-top: 0;
+}
+
+.rating {
+    background: #FAC539;
+    border-radius: 8px;
+    padding: 7px 12px 8px 12px;
+    color: black;
+    font-weight: 900;
+    position: absolute;
+    right: 20px;
+}
+
+.rating p {
+    margin: 0;
+}
+
+.inner hr {
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin: 0;
+}
+
+.globe {
+    display: flex;
+}
+
+.globe p {
+    font-size: 0.85em;
+    margin: 15px 5px 0 0;
+}
+
+.awards p {
+    font-size: 0.85em;
+    margin: 5px 0 0 0;
+}
+
+.linkTo {
+    color: white;
+    text-decoration: none;
+}

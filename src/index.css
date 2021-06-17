@@ -1,0 +1,14 @@
+body {
+    margin: 0;
+    background-color: black;
+    font-family: 'Montserrat', sans-serif;
+}
+
+*:focus {
+    outline: none;
+}
+
+.swiper-pagination-bullet {
+    background-color: white !important;
+}
+

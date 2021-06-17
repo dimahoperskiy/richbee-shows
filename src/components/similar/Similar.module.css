@@ -1,0 +1,60 @@
+.wrapper {
+    margin-right: 30px;
+    position: relative;
+}
+
+.wrapper img {
+    width: 240px;
+    height: 350px;
+    border-radius: 12px;
+}
+
+.open {
+    filter: brightness(0.7);
+}
+
+.toggle {
+    visibility: hidden;
+    height: 0;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: white;
+    font-weight: 400;
+    padding: 52px 0 0 30px;
+    transition: all 0.5s ease;
+}
+
+.toggle p {
+    color: white;
+    margin: 5px 0;
+    width: 100%;
+}
+
+.toggle h2 {
+    font-weight: 800;
+    margin: 0;
+    width: 80%;
+}
+
+.rating {
+    background: #FAC539;
+    border-radius: 8px;
+    padding: 7px 12px 8px 12px;
+    font-weight: 900;
+    width: 80px;
+    position: absolute;
+    bottom: 0;
+}
+
+.rating p {
+    margin: 0;
+    color: black;
+}
+
+.active {
+    visibility: visible;
+    height: 70%;
+    opacity: 1;
+}
