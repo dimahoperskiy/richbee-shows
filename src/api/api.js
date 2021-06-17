@@ -3,7 +3,7 @@ import axios from "axios"
 const inst = axios.create({
     baseURL: "https://imdb8.p.rapidapi.com/",
     headers: {
-        'x-rapidapi-key': '3bd9821c43msh3d8d144ef02f038p14c79ejsne9fdc4de02a6',
+        'x-rapidapi-key': 'edd4ccf948mshd809ebd86c1ea13p103127jsnec223d55dda7',
         'x-rapidapi-host': 'imdb8.p.rapidapi.com'
     },
     method: 'GET'
