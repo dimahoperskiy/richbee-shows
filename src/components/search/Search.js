@@ -26,7 +26,6 @@ const Search = (props) => {
         if (props.match.params.name) {
             setInputValue(props.match.params.name)
             history.push("/")
-            // click()
         }
     }, [])
 
@@ -35,7 +34,7 @@ const Search = (props) => {
         setInputValue(e.target.value)
     }
 
-    let click = (e) => {
+    let click = async (e) => {
         if (e) e.preventDefault()
 
         if (!inputValue) {
@@ -43,98 +42,94 @@ const Search = (props) => {
         } else {
             setHasError(false)
             setIsSending(true)
-            api.getFilmsByName(inputValue)
-                .then((data1 => {
-                    if (data1.d !== undefined) {
-                        setNotFound(false)
-                        let film = data1.d[0]
-                        if (film.id.slice(0, 2) === "tt") {
-                            api.getOverviewDetails(film.id)
-                                .then((data2) => {
-                                    if (data2.ratings.otherRanks) {
-                                        let rating = data2.ratings.otherRanks[0]
-                                        film.otherRating = {
-                                            label: rating.label,
-                                            rank: rating.rank
-                                        }
-                                    }
-                                    data2.genres ?
-                                        film.genre = data2.genres[0] :
-                                        film.genre = "?"
-                                    film.rating = data2.ratings.rating
-                                    api.getRatings(film.id)
-                                        .then(data3 => {
-                                            let win = 0
-                                            let lose = 0
-                                            let globe = 0
-                                            let awards = data3.resource.awards
-                                            if (awards) {
-                                                awards.forEach(el => {
-                                                    if (el.isWinner) {
-                                                        if (el.awardName === "Golden Globe") globe++
-                                                        else win++
-                                                    } else lose++
-                                                })
-                                            }
-                                            film.globes = globe
-                                            film.wins = win
-                                            film.loses = lose
-                                            setFilmsList(data1.d)
-                                            setIsSending(false)
-                                        })
-                                })
-                        } else {
-                            let films = data1.d.filter(el => el.id.slice(0, 2) === "tt")
-                            setFilmsList(films)
-                            setIsSending(false)
+
+
+            let data1 = await api.getFilmsByName(inputValue)
+            if (data1.d !== undefined) {
+                setNotFound(false)
+                let film = data1.d[0]
+                if (film.id.slice(0, 2) === "tt") {
+                    let data2 = await api.getOverviewDetails(film.id)
+                    if (data2.ratings.otherRanks) {
+                        let rating = data2.ratings.otherRanks[0]
+                        film.otherRating = {
+                            label: rating.label,
+                            rank: rating.rank
                         }
-                    } else {
-                        setNotFound(true)
-                        setIsSending(false)
                     }
-                }))
+                    data2.genres ?
+                        film.genre = data2.genres[0] :
+                        film.genre = "?"
+                    film.rating = data2.ratings.rating
+                    let data3 = await api.getRatings(film.id)
+
+                    let [win, lose, globe] = [0, 0, 0]
+
+                    let awards = data3.resource.awards
+                    if (awards) {
+                        awards.forEach(el => {
+                            if (el.isWinner) {
+                                if (el.awardName === "Golden Globe") globe++
+                                else win++
+                            } else lose++
+                        })
+                    }
+                    [film.globes, film.wins, film.loses] = [globe, win, lose]
+                    setFilmsList(data1.d)
+                    setIsSending(false)
+                } else {
+                    let films = data1.d.filter(el => el.id.slice(0, 2) === "tt")
+                    setFilmsList(films)
+                    setIsSending(false)
+                }
+            } else {
+                setNotFound(true)
+                setIsSending(false)
+            }
         }
     }
 
-    let slideChanged = (swiper) => {
+    let slideChanged = async (swiper) => {
         setIsSending(true)
         let film = filmsList[swiper.activeIndex]
-        api.getOverviewDetails(film.id)
-            .then((data) => {
-                let newFilms = [...filmsList]
-                if (data.ratings.otherRanks) {
-                    let rating = data.ratings.otherRanks[0]
-                    newFilms[swiper.activeIndex].otherRating = {
-                        label: rating.label,
-                        rank: rating.rank
-                    }
-                }
-                data.genres ?
-                    newFilms[swiper.activeIndex].genre = data.genres[0] :
-                    newFilms[swiper.activeIndex].genre = "?"
 
-                newFilms[swiper.activeIndex].rating = data.ratings.rating
-                api.getRatings(film.id)
-                    .then(data1 => {
-                        let win = 0
-                        let lose = 0
-                        let globe = 0
-                        let awards = data1.resource.awards
-                        if (awards) {
-                            awards.forEach(el => {
-                                if (el.isWinner) {
-                                    if (el.awardName === "Golden Globe") globe++
-                                    else win++
-                                } else lose++
-                            })
-                        }
-                        newFilms[swiper.activeIndex].globes = globe
-                        newFilms[swiper.activeIndex].wins = win
-                        newFilms[swiper.activeIndex].loses = lose
-                        setFilmsList(newFilms)
-                        setIsSending(false)
-                    })
+        let data = await api.getOverviewDetails(film.id)
+
+        let newFilms = [...filmsList]
+        if (data.ratings.otherRanks) {
+            let rating = data.ratings.otherRanks[0]
+            newFilms[swiper.activeIndex].otherRating = {
+                label: rating.label,
+                rank: rating.rank
+            }
+        }
+        data.genres ?
+            newFilms[swiper.activeIndex].genre = data.genres[0] :
+            newFilms[swiper.activeIndex].genre = "?"
+
+        newFilms[swiper.activeIndex].rating = data.ratings.rating
+        let data1 = await api.getRatings(film.id)
+
+        let win = 0
+        let lose = 0
+        let globe = 0
+        let awards = data1.resource.awards
+        if (awards) {
+            awards.forEach(el => {
+                if (el.isWinner) {
+                    if (el.awardName === "Golden Globe") globe++
+                    else win++
+                } else lose++
             })
+        }
+        [
+            newFilms[swiper.activeIndex].globes,
+            newFilms[swiper.activeIndex].wins,
+            newFilms[swiper.activeIndex].loses
+        ] = [globe, win, lose]
+
+        setFilmsList(newFilms)
+        setIsSending(false)
     }
 
 

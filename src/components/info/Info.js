@@ -18,89 +18,82 @@ const Info = (props) => {
     }
 
     useEffect(() => {
-        let id = props.match.params.id
-        setIsSending(true)
-        api.getOverviewDetails(id)
-            .then(data => {
-                let obj = {}
-                if (data.ratings.otherRanks) {
-                    let rating = data.ratings.otherRanks[0]
-                    obj.otherRating = {
-                        label: rating.label,
-                        rank: rating.rank
-                    }
+        let effect = async () => {
+            let id = props.match.params.id
+            setIsSending(true)
+            let data = await api.getOverviewDetails(id)
+
+            let obj = {}
+            if (data.ratings.otherRanks) {
+                let rating = data.ratings.otherRanks[0]
+                obj.otherRating = {
+                    label: rating.label,
+                    rank: rating.rank
                 }
-                obj.title = data.title.title
-                obj.titleType = data.title.titleType
-                obj.year = data.title.year
-                data.genres ? obj.genre = data.genres[0] : obj.genre = "?"
-                obj.rating = data.ratings.rating
-                api.getImages(id)
-                    .then(data => {
-                        setImages(data.images)
-                        api.getRatings(id)
-                            .then(data => {
-                                let win = 0
-                                let lose = 0
-                                let globe = 0
-                                let awards = data.resource.awards
-                                if (awards) {
-                                    awards.forEach(el => {
-                                        if (el.isWinner) {
-                                            if (el.awardName === "Golden Globe") globe++
-                                            else win++
-                                        } else lose++
-                                    })
-                                }
-                                obj.globes = globe
-                                obj.wins = win
-                                obj.loses = lose
-                                console.log(id)
-                                api.getPlots(id)
-                                    .then(data => {
-                                        let max = 0
-                                        let max_id = -1
-                                        let cnt = 0
-                                        if (data.plots) {
-                                            data.plots.forEach(el => {
-                                                if (el.text.length > max) {
-                                                    max = el.text.length
-                                                    max_id = cnt
-                                                }
-                                                cnt++
-                                            })
-                                        }
-                                        if (data.plots[max_id]) obj.plot = data.plots[max_id].text
-                                        else obj.plot = "No description"
-                                        api.getSimilar(id)
-                                            .then(data => {
-                                                let sim = []
-                                                let cnt = 1
-                                                data.forEach(el => {
-                                                    api.getOverviewDetails(el.slice(7, -1))
-                                                        .then(data1 => {
-                                                            sim.push(data1)
-                                                            console.log(cnt, data.length)
+            }
+            [obj.title, obj.titleType, obj.year, obj.rating] =
+                [data.title.title, data.title.titleType, data.title.year, data.ratings.rating]
+            data.genres ? obj.genre = data.genres[0] : obj.genre = "?"
 
-                                                            if (cnt === data.length) {
-                                                                setSimilar(sim)
-                                                                setFilm(obj)
-                                                                setIsSending(false)
-                                                            }
-                                                            cnt++
-                                                        })
-                                                })
-                                            })
-                                    })
-                            })
+            let data1 = await api.getImages(id)
+            setImages(data1.images)
+
+            let data2 = await api.getRatings(id)
+
+            let [win, lose, globe] = [0, 0, 0]
+
+            let awards = data2.resource.awards
+            if (awards) {
+                awards.forEach(el => {
+                    if (el.isWinner) {
+                        if (el.awardName === "Golden Globe") globe++
+                        else win++
+                    } else lose++
+                })
+            }
+            [obj.globes, obj.wins, obj.loses] = [globe, win, lose]
+
+            let data3 = await api.getPlots(id)
+
+            let [max, max_id, cnt] = [0, -1, 0]
+
+            if (data3.plots) {
+                data3.plots.forEach(el => {
+                    if (el.text.length > max) {
+                        max = el.text.length
+                        max_id = cnt
+                    }
+                    cnt++
+                })
+            }
+            if (data3.plots[max_id]) obj.plot = data3.plots[max_id].text
+            else obj.plot = "No description"
+            let data4 = await api.getSimilar(id)
+
+            let sim = []
+            let cnt1 = 1
+            data4.forEach(el => {
+                api.getOverviewDetails(el.slice(7, -1))
+                    .then(data1 => {
+                        sim.push(data1)
+                        console.log(cnt1, data4.length)
+
+                        if (cnt1 === data4.length) {
+                            setSimilar(sim)
+                            setFilm(obj)
+                            setIsSending(false)
+                        }
+                        cnt1++
                     })
-
             })
+        }
+
+        effect().then(_ => {})
+
+
     }, [props.match.params.id])
 
     let similarAll = similar.map(el => <Similar {...el}/>)
-
-    console.log(similar)
 
     return (
         <>
@@ -130,7 +123,8 @@ const Info = (props) => {
                                 <p>|</p>
                                 <p>{film.year}</p>
                             </div>
-                            <a className={style.watchBtn} href="#" onClick={() => alert("К сожалению я не смог найти ссылку на трейлер из их апишки 😔")}>Watch</a>
+                            <a className={style.watchBtn} href="#"
+                               onClick={() => alert("К сожалению я не смог найти ссылку на трейлер из их апишки 😔")}>Watch</a>
                             <div className={style.awards}>
                                 <p>{film.otherRating ? film.otherRating.label : ""}
                                     #{film.otherRating ? film.otherRating.rank : ""}</p>
