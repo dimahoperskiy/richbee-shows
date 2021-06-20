@@ -1,6 +1,7 @@
 # richbee-shows
+React app using IMDb API to find info about films or series.
 
-The source code is on master branch
+The source code is on master branch.
 
  https://dimahoperskiy.github.io/richbee-shows/
  
